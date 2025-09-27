@@ -62,4 +62,4 @@ Mamalight is a Python application that uses Flask, Twilio, Cohere, APScheduler, 
 - For production, secure your `.env` file and never share your credentials.
 
 ## License
-MIT (or specify your license)
+MIT
