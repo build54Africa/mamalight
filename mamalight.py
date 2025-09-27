@@ -9,6 +9,8 @@ from twilio.rest import Client
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 import cohere
+import requests
+import json
 
 # Load environment variables from .env
 load_dotenv()
@@ -101,10 +103,10 @@ def send_personalized_reminder(phone, name):
     message = cohere_chat(message_prompt)
 
     client.messages.create(
-        from_=os.getenv("TWILIO_WHATSAPP_NUMBER"),
-        body=message,
-        to=f'whatsapp:{phone}'
-    )
+    from_=f"whatsapp: {os.getenv("TWILIO_PHONE_NUMBER")}",  # Twilio sandbox number
+    body=message,
+    to=f'whatsapp:{phone}'
+)
 
     # Schedule next checkup reminder after 4 weeks
     next_date = datetime.now() + timedelta(weeks=4)
@@ -117,6 +119,7 @@ def schedule_first_reminder(phone, name, first_date):
 # Flask route for WhatsApp messages
 @app.route("/whatsapp", methods=['POST'])
 def whatsapp_bot():
+    print(request)
     incoming_msg = request.values.get('Body', '').strip()
     phone = request.values.get('From', '').replace('whatsapp:', '')
     resp = MessagingResponse()
@@ -128,7 +131,7 @@ def whatsapp_bot():
             parts = incoming_msg.split(" ", 1)[1].split(",")
             name = parts[0].strip()
             gest_age = int(parts[1].strip())
-            first_checkup = datetime.now() + timedelta(weeks=4)
+            first_checkup = datetime.now() + timedelta(seconds=10)
             add_user(phone, name, gest_age, first_checkup.strftime("%Y-%m-%d %H:%M:%S"))
             schedule_first_reminder(phone, name, first_checkup)
             msg.body(f"🌸 Registration complete! 🌸\nYour first checkup reminder will be sent on {first_checkup.strftime('%Y-%m-%d %H:%M:%S')}\nWelcome to MamaLight, {name}!")
