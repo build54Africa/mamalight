@@ -1,4 +1,4 @@
-# Mamalight
+# MamaLight
 
 Mamalight is a Python application that uses Flask, Twilio, Cohere, APScheduler, and python-dotenv to provide SMS-based services. It integrates with Twilio for sending/receiving SMS, Cohere for AI-powered text processing, and APScheduler for scheduled tasks. Environment variables are managed using python-dotenv.
 
