@@ -73,7 +73,7 @@ def update_next_checkup(phone, next_date):
 def cohere_chat(message):
     try:
         response = co.chat(
-            model="command-a-03-2025",
+            model="command-r-plus-08-2024",
             messages=[{"role": 'user', "content": message}],
             max_tokens=400
         )
