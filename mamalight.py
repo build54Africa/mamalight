@@ -22,7 +22,7 @@ scheduler.start()
 client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
 
 # Initialize Cohere client
-co = cohere.Client(os.getenv("COHERE_API_KEY"))
+co = cohere.ClientV2(os.getenv("COHERE_API_KEY"))
 
 # Database setup
 DB_FILE = "db.sqlite3"
@@ -72,22 +72,23 @@ def update_next_checkup(phone, next_date):
 # Cohere Chat API with friendly formatting
 def cohere_chat(message):
     try:
-        response = co.generate(
-            model="command-xlarge-nightly",
-            prompt=message,
-            max_tokens=150,
-            temperature=0.7
+        response = co.chat(
+            model="command-a-03-2025",
+            messages=[{"role": 'user', "content": message}],
+            max_tokens=400
         )
-        text = response.generations[0].text
+        text = response.message.content[0].text
 
-        # Remove markdown symbols
+        # # # # Remove markdown symbols
         clean_text = re.sub(r"[*_`#>-]", "", text).strip()
 
-        # Add friendly emojis and prefix for WhatsApp
+         # Add friendly emojis and prefix for WhatsApp
         friendly_text = f"🌸 MamaLight says:\n{clean_text}"
 
-        # Add line breaks for readability after periods
+        # # # # Add line breaks for readability after periods
         friendly_text = re.sub(r"(\. )", r".\n", friendly_text)
+
+  
 
         return friendly_text
 
@@ -96,7 +97,7 @@ def cohere_chat(message):
 
 # Reminder system
 def send_personalized_reminder(phone, name):
-    message_prompt = f"Send a warm, encouraging antenatal checkup reminder to {name} with simple health tips."
+    message_prompt = f"Send a warm, encouraging antenatal checkup reminder to {name} with simple health tips, keeping it short and concise"
     message = cohere_chat(message_prompt)
 
     client.messages.create(
